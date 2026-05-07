@@ -1,5 +1,5 @@
 const DB_NAME = 'BioIntelligenceHubDB';
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 
 window. store = {
     db: null,
@@ -11,7 +11,7 @@ window. store = {
 
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
-                    const stores = ['projects', 'plans', 'evidence', 'companion', 'settings', 'memos', 'chat', 'expeditions'];
+                    const stores = ['projects', 'plans', 'evidence', 'companion', 'settings', 'memos', 'chat', 'expeditions', 'writing_styles', 'cellvoyager_jobs'];
                     stores.forEach(s => {
                         if (!db.objectStoreNames.contains(s)) {
                             if (s === 'plans' || s === 'evidence') {

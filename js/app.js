@@ -51,7 +51,9 @@ window.BioHubApp = class BioHubApp {
                 { name: 'evidence', module: evidence },
                 { name: 'companion', module: companion },
                 { name: 'memos', module: memos },
-                { name: 'settings', module: settings }
+                { name: 'settings', module: settings },
+                { name: 'styleDistiller', module: styleDistiller },
+                { name: 'cellvoyager', module: cellvoyager }
             ];
 
             for (const feature of features) {
@@ -140,6 +142,8 @@ window.BioHubApp = class BioHubApp {
             if (tabId === 'projects' && projects.refresh) projects.refresh();
             if (tabId === 'evidence' && evidence.refresh) evidence.refresh();
             if (tabId === 'memos' && memos.refreshList) memos.refreshList();
+            if (tabId === 'style' && styleDistiller.refresh) styleDistiller.refresh();
+            if (tabId === 'cellvoyager' && cellvoyager.refresh) cellvoyager.refresh();
         } catch (e) {
             console.warn(`Tab refresh for '${tabId}' failed:`, e);
         }

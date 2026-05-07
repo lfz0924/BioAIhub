@@ -67,6 +67,38 @@ window. settings = {
                 }
             }
 
+            // Load CellVoyager Settings
+            const cvSettings = await store.get('settings', 'cellvoyager');
+            const cvUrlEl = document.getElementById('settings-cv-url');
+            if (cvSettings && cvUrlEl) {
+                cvUrlEl.value = cvSettings.backendUrl || '';
+            }
+
+            // CellVoyager connection test
+            const btnTestCV = document.getElementById('btn-test-cv-connection');
+            if (btnTestCV) {
+                btnTestCV.addEventListener('click', async () => {
+                    const url = document.getElementById('settings-cv-url')?.value?.trim();
+                    const statusEl = document.getElementById('cv-connection-status');
+                    if (!url) {
+                        if (statusEl) { statusEl.textContent = 'Please enter URL'; statusEl.style.color = '#ff4444'; }
+                        return;
+                    }
+                    if (statusEl) { statusEl.textContent = 'Testing...'; statusEl.style.color = 'var(--text-muted)'; }
+                    try {
+                        const resp = await fetch(`${url}/api/health`, { signal: AbortSignal.timeout(5000) });
+                        const data = await resp.json();
+                        if (data.status === 'ok') {
+                            if (statusEl) { statusEl.textContent = 'Connected ✓'; statusEl.style.color = '#4ade80'; }
+                        } else {
+                            if (statusEl) { statusEl.textContent = 'Unexpected response'; statusEl.style.color = '#ff4444'; }
+                        }
+                    } catch (e) {
+                        if (statusEl) { statusEl.textContent = 'Connection failed'; statusEl.style.color = '#ff4444'; }
+                    }
+                });
+            }
+
             const traitSettings = await store.get('settings', 'companion');
             if (traitSettings) {
                 const traitEl = document.getElementById('settings-companion-trait');
@@ -156,6 +188,13 @@ window. settings = {
                             custom: customEl.value
                         });
                     }
+
+                    // Save CellVoyager config
+                    const cvUrl = document.getElementById('settings-cv-url')?.value?.trim() || '';
+                    await store.set('settings', {
+                        id: 'cellvoyager',
+                        backendUrl: cvUrl
+                    });
 
                     ui.showNotification('Settings saved successfully', 'success');
                 } catch (e) {

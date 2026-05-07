@@ -1,7 +1,7 @@
 
 
 window. ai = {
-    async call(prompt, systemInstruction = '') {
+    async call(prompt, systemInstruction = '', options = {}) {
         const settings = await store.get('settings', 'api');
         if (!settings || !settings.apiKey) {
             throw new Error('API key not found. Please configure it in settings.');
@@ -26,8 +26,8 @@ window. ai = {
                     }
                 ],
                 generationConfig: {
-                    temperature: 0.7,
-                    maxOutputTokens: 2048
+                    temperature: options.temperature || 0.7,
+                    maxOutputTokens: options.maxOutputTokens || 2048
                 }
             })
         });
