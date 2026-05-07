@@ -65,6 +65,30 @@ window.styleDistiller = {
         }
     },
 
+    // Extract a JSON object from text by matching opening/closing braces
+    extractJsonObject(text) {
+        const startIdx = text.indexOf('{');
+        if (startIdx === -1) return null;
+        let depth = 0;
+        let inString = false;
+        let escape = false;
+        for (let i = startIdx; i < text.length; i++) {
+            const ch = text[i];
+            if (escape) { escape = false; continue; }
+            if (ch === '\\') { escape = true; continue; }
+            if (ch === '"') { inString = !inString; continue; }
+            if (inString) continue;
+            if (ch === '{') depth++;
+            if (ch === '}') {
+                depth--;
+                if (depth === 0) {
+                    return text.substring(startIdx, i + 1);
+                }
+            }
+        }
+        return null;
+    },
+
     async handlePDFUpload(file) {
         const progressEl = document.getElementById('style-progress');
         const progressText = document.getElementById('style-progress-text');
@@ -158,15 +182,30 @@ ${truncatedText}
 
         const rawResponse = await ai.call(prompt, systemInstruction, { maxOutputTokens: 4096 });
 
-        // Parse JSON response
+        // Parse JSON response with multiple fallback strategies
         let dimensions;
+
+        // Strategy 1: Strip markdown fencing
+        const stripped = rawResponse.replace(/^```(?:json)?\s*\n?/gm, '').replace(/```$/gm, '').trim();
+
+        // Strategy 2: Direct parse
         try {
-            dimensions = JSON.parse(rawResponse);
+            dimensions = JSON.parse(stripped);
         } catch (e) {
-            // Try to extract JSON from response
-            const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                dimensions = JSON.parse(jsonMatch[0]);
+            // Strategy 3: Extract JSON using brace matching
+            const jsonStr = this.extractJsonObject(stripped);
+            if (jsonStr) {
+                try {
+                    dimensions = JSON.parse(jsonStr);
+                } catch (e2) {
+                    // Strategy 4: Greedy match as last resort
+                    const match = stripped.match(/\{[\s\S]*\}/);
+                    if (match) {
+                        dimensions = JSON.parse(match[0]);
+                    } else {
+                        throw new Error('AI 返回格式错误，请重试。');
+                    }
+                }
             } else {
                 throw new Error('AI 返回格式错误，请重试。');
             }
