@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a14">
+    <title>BioIntelligence Hub v2 | Research Workbench</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,700;1,300&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+</head>
+<body data-global-theme="midnight">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="logo">BioHub v2</div>
+        
+        <div class="sidebar-section">
+            <span class="section-label" data-i18n="label_nav">导航</span>
+            <div class="nav-item active" data-tab="dashboard">
+                <span data-i18n="nav_dashboard">仪表盘</span>
+            </div>
+            <div class="nav-item" data-tab="projects">
+                <span data-i18n="nav_projects">科研项目</span>
+            </div>
+            <div class="nav-item" data-tab="planner">
+                <span data-i18n="nav_ai_planner">✦ AI 规划器</span>
+            </div>
+            <div class="nav-item" data-tab="evidence">
+                <span data-i18n="nav_evidence">证据库</span>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <span class="section-label" data-i18n="label_tools">科研工具</span>
+            <div class="nav-item" data-tab="tools">
+                <span data-i18n="nav_all_tools">工具库</span>
+            </div>
+            <div class="nav-item" data-tab="guide">
+                <span data-i18n="nav_guide">使用指南</span>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="nav-item" data-tab="companion">
+                <span data-i18n="nav_companion">伙伴系统</span>
+            </div>
+            <div class="nav-item" data-tab="memos">
+                <span>📝 备忘录 (Memos)</span>
+            </div>
+
+            <div class="nav-item" data-tab="settings">
+                <span data-i18n="btn_api_settings">⚙ API 设置</span>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="section-label" data-i18n="label_appearance">外观设定</div>
+                <div class="theme-selector">
+                    <div class="theme-dot day" data-theme="day" title="Day"></div>
+                    <div class="theme-dot sunset" data-theme="sunset" title="Sunset"></div>
+                    <div class="theme-dot midnight" data-theme="midnight" title="Midnight"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Dashboard Workspace -->
+        <section id="dashboard-workspace" class="workspace active">
+            <header class="header">
+                <h1 data-i18n="nav_dashboard">仪表盘</h1>
+                <p data-i18n="dashboard_slogan">欢迎回来。继续您的科研探索。</p>
+            </header>
+            
+            <div class="dashboard-grid">
+                <div class="dashboard-card recent-projects">
+                    <div class="card-header">
+                        <h2 data-i18n="recent_projects">最近项目</h2>
+                        <button class="btn-text" id="btn-new-project-dash">+ New</button>
+                    </div>
+                    <div id="recent-projects-list" class="item-list"></div>
+                </div>
+
+                <div class="dashboard-card recent-plans">
+                    <div class="card-header">
+                        <h2 data-i18n="recent_plans">最近规划</h2>
+                    </div>
+                    <div id="recent-plans-list" class="item-list"></div>
+                </div>
+
+                <div class="dashboard-card quick-actions">
+                    <h2 data-i18n="quick_actions">快速操作</h2>
+                    <div class="action-buttons">
+                        <button class="btn-action" data-action="new-project" data-i18n="action_new_project">创建新项目</button>
+                        <button class="btn-action" data-action="open-planner" data-i18n="nav_ai_planner">打开规划器</button>
+                        <button class="btn-action" data-action="add-evidence" data-i18n="action_add_evidence">录入证据</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Workspace -->
+        <section id="projects-workspace" class="workspace">
+            <header class="header">
+                <h1 data-i18n="nav_projects">科研项目</h1>
+                <div class="header-actions">
+                    <button class="btn-primary" id="btn-create-project" data-i18n="action_new_project">创建新项目</button>
+                </div>
+            </header>
+            <div id="projects-grid" class="project-grid"></div>
+        </section>
+
+        <!-- Project Detail Workspace (Hidden by default) -->
+        <section id="project-detail-workspace" class="workspace">
+            <!-- Dynamic content injected by projects.js -->
+        </section>
+
+        <!-- Planner Workspace -->
+        <section id="planner-workspace" class="workspace">
+            <header class="header">
+                <h1 data-i18n="nav_ai_planner">✦ AI 规划器</h1>
+                <p data-i18n="planner_tab_slogan">描述你的研究问题，AI 自动规划多工具检索策略。</p>
+            </header>
+            <div class="planner-container">
+                <div class="planner-form card">
+                    <label data-i18n="active_project">当前项目</label>
+                    <select id="planner-project-select" class="selector"></select>
+
+                    <label data-i18n="planner_q_label">研究问题</label>
+                    <textarea id="planner-q" data-i18n-placeholder="planner_q_placeholder"></textarea>
+
+                    <label data-i18n="planner_bg_label">生物学背景（可选）</label>
+                    <textarea id="planner-bg" data-i18n-placeholder="planner_bg_placeholder"></textarea>
+
+                    <div class="planner-actions">
+                        <button id="btn-generate-plan" class="btn-primary" data-i18n="planner_btn_generate">✦ 生成分析计划</button>
+                        <div class="planner-spinner"></div>
+                    </div>
+                </div>
+                <div id="plan-output" class="plan-result"></div>
+            </div>
+        </section>
+
+        <!-- Evidence Workspace -->
+        <section id="evidence-workspace" class="workspace">
+            <header class="header">
+                <h1 data-i18n="nav_evidence">证据库</h1>
+                <div class="header-filters">
+                    <select id="evidence-project-filter" class="selector mini"></select>
+                    <button class="btn-primary" id="btn-add-evidence">录入证据</button>
+                </div>
+            </header>
+            <div id="evidence-list" class="evidence-grid"></div>
+        </section>
+
+        <!-- Tools Workspace -->
+        <section id="tools-workspace" class="workspace">
+            <header class="header">
+                <h1 data-i18n="nav_all_tools">科研工具库</h1>
+            </header>
+            <div class="tool-tabs">
+                <button class="tool-tab-btn active" data-tool-tab="discovery" data-i18n="nav_discovery">文献发现</button>
+                <button class="tool-tab-btn" data-tool-tab="analysis" data-i18n="nav_analysis">深度分析</button>
+                <button class="tool-tab-btn" data-tool-tab="writing" data-i18n="nav_writing">学术写作</button>
+                <button class="tool-tab-btn" data-tool-tab="image_gen" data-i18n="nav_image_gen">学术绘图</button>
+            </div>
+            <div id="tools-container" class="tool-grid active"></div>
+        </section>
+
+        <!-- Guide Workspace -->
+        <section id="guide-workspace" class="workspace">
+            <header class="header">
+                <h1 data-i18n="nav_guide">使用指南</h1>
+            </header>
+            <div id="guide-container" class="guide-content active"></div>
+        </section>
+
+        <!-- Companion Workspace -->
+        <section id="companion-workspace" class="workspace">
+            <!-- Ported Companion UI -->
+        </section>
+
+        <!-- Memos Workspace -->
+        <section id="memos-workspace" class="workspace">
+            <header class="header">
+                <h1>📝 科研备忘录</h1>
+                <div class="header-actions">
+                    <button class="btn-text" id="btn-sync-folder">🔗 关联本地文件夹</button>
+                    <span id="sync-status" class="status-tag">Unlinked</span>
+                </div>
+            </header>
+
+            <div class="memo-layout">
+                <div class="memo-sidebar card">
+                    <button class="btn-primary" id="btn-new-memo" style="width: 100%;">+ New Memo</button>
+                    <div id="memo-list" class="mini-list" style="margin-top: 20px;">
+                        <!-- Memos list here -->
+                    </div>
+                </div>
+
+                <div class="memo-editor-container card">
+                    <div class="editor-header">
+                        <input type="text" id="memo-title" placeholder="Memo Title..." class="plain-input">
+                        <div class="editor-actions">
+                            <button class="btn-text" id="btn-export-memo">💾 Export</button>
+                            <button class="btn-text" id="btn-delete-memo" style="color: #ff4444;">Delete</button>
+                        </div>
+                    </div>
+                    <div class="editor-split">
+                        <textarea id="memo-content" placeholder="Type Markdown here..."></textarea>
+                        <div id="memo-preview" class="markdown-body"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Workspace -->
+        <section id="settings-workspace" class="workspace">
+            <header class="header">
+                <h1 data-i18n="btn_api_settings">⚙ API 设置</h1>
+            </header>
+            <div class="settings-container card">
+                <label data-i18n="settings_base_url_label">API Base URL</label>
+                <input type="text" id="settings-base-url">
+                
+                <label data-i18n="settings_key_label">API Key</label>
+                <input type="password" id="settings-api-key">
+                
+                <h3>模型配置</h3>
+                <label>默认 AI 模型</label>
+                <select id="settings-model" class="selector">
+                    <option value="gemini-2.0-flash">Gemini 2.0 Flash (推荐)</option>
+                    <option value="gemini-2.0-pro-exp-02-05">Gemini 2.0 Pro Exp</option>
+                    <option value="custom">自定义模型</option>
+                </select>
+                <div id="custom-model-container" style="display:none; margin-top:10px;">
+                    <input type="text" id="settings-custom-model" placeholder="输入模型名称 (如 claude-3-5-sonnet)">
+                </div>
+
+                <h3 style="margin-top: 30px;">腾讯 IMA 配置 (第二大脑)</h3>
+                <label>IMA Client ID</label>
+                <input type="text" id="settings-ima-client-id" placeholder="填写 IMA Agent-Interface 获取的 Client ID">
+                <label>IMA API Key</label>
+                <input type="password" id="settings-ima-api-key" placeholder="填写 IMA API Key">
+                <label>连接模式 (Connection Mode)</label>
+                <select id="settings-ima-mode" class="selector">
+                    <option value="direct">云端直连 (Direct - 需跨域插件)</option>
+                    <option value="proxy">本地代理 (Proxy - 推荐/最稳妥)</option>
+                </select>
+                <div id="ima-proxy-hint" class="settings-hint" style="display:none;">
+                    请运行项目目录下的 <code>启动IMA代理.command</code>。地址：<code>http://localhost:3000/ima</code>
+                </div>
+                <p class="settings-hint">请前往 <a href="https://ima.qq.com/agent-interface" target="_blank" style="color:var(--accent-primary)">ima.qq.com</a> 申请获取凭证。</p>
+            </div>
+
+            <div class="settings-container card" style="margin-top: 20px;">
+                <h3 data-i18n="label_appearance">外观设定 (Visuals)</h3>
+                
+                <label>Glass Blur (<span id="val-blur">12</span>px)</label>
+                <input type="range" id="settings-glass-blur" min="0" max="30" value="12" style="width: 100%; margin-bottom: 15px;">
+                
+                <label>Glass Opacity (<span id="val-opacity">0.15</span>)</label>
+                <input type="range" id="settings-glass-opacity" min="0" max="100" value="15" style="width: 100%;">
+            </div>
+
+            <div class="settings-container card" style="margin-top: 20px;">
+                <h3>🤖 伙伴人设 (Companion Traits)</h3>
+                <label>性格偏好 (Personality)</label>
+                <select id="settings-companion-trait" class="selector">
+                    <option value="professional">专业严谨 (Professional)</option>
+                    <option value="encouraging">温柔鼓励 (Encouraging)</option>
+                    <option value="critical">批判思维 (Critical)</option>
+                    <option value="humorous">Humorous (Witty & Relaxed)</option>
+                </select>
+                <label>Custom System Instruction (Override default personality)</label>
+                <textarea id="settings-companion-custom" placeholder="You are an expert bioinformatician..." style="height: 80px;"></textarea>
+
+                <div class="settings-actions" style="margin-top: 20px;">
+                    <button id="btn-save-settings" class="btn-primary" data-i18n="settings_save">保存设置 (Save Settings)</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Global Modals -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal card">
+            <div id="modal-content"></div>
+            <button class="btn-close" id="btn-close-modal">×</button>
+        </div>
+    </div>
+
+    <!-- Pet Trigger -->
+    <div class="pet-trigger" id="pet-trigger">
+        <img src="" id="pet-trigger-img" alt="Pet">
+    </div>
+
+    <!-- Scripts (Ordered for local file compatibility) -->
+    <script src="data/translations.js"></script>
+    <script src="data/toolCatalog.js"></script>
+    <script src="data/guideContent.js"></script>
+    <script src="data/petImages.js"></script>
+    
+    <script src="js/ui.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/ima_client.js"></script>
+    <script src="js/ai.js"></script>
+    <script src="js/migration.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/projects.js"></script>
+    <script src="js/planner.js"></script>
+    <script src="js/evidence.js"></script>
+    <script src="js/memos.js"></script>
+    <script src="js/companion.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
